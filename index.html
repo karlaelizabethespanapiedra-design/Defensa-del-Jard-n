@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#245b2a">
+<meta name="description" content="Videojuego educativo de factorización: defiende el jardín y resuelve el examen.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Defiende el jardín | Examen de factorización</title>
+<style>
+:root{--green:#286b35;--deep:#153d25;--lime:#a8df62;--cream:#fff8df;--ink:#183322;--red:#b53b31;--gold:#f6c84b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#e9f5d7,#fdf4d2);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:12px;padding:.72rem 1rem;font-weight:750;background:var(--green);color:white;box-shadow:0 3px 0 #174324}button:disabled{opacity:.45;cursor:not-allowed}
+.wrap{max-width:1100px;margin:auto;padding:14px}.hero{background:linear-gradient(120deg,#174b2b,#397e3a);color:white;border-radius:20px;padding:18px 20px;box-shadow:0 7px 20px #244c2930}
+h1{font-size:clamp(1.45rem,4vw,2.3rem);margin:.1rem 0}.sub{opacity:.9}.panel{background:#fffdf4;border:2px solid #d7e7bd;border-radius:18px;padding:16px;box-shadow:0 5px 16px #31542a14;margin-top:14px}
+.formgrid{display:grid;grid-template-columns:2fr 1fr;gap:10px}.field label{display:block;font-size:.88rem;font-weight:800;margin-bottom:5px}.field input,.field select,.answer-input{width:100%;border:2px solid #cbdcb9;border-radius:10px;padding:11px;background:white;color:#183322}
+.small{font-size:.86rem;color:#536b56}.hidden{display:none!important}.topstats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.stat{background:#fffdf2;border:1px solid #d8e5c8;border-radius:12px;padding:8px 12px;font-weight:800}
+.gamegrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);gap:14px}.boardwrap{min-width:0}
+.board{position:relative;overflow:hidden;border:5px solid #6d9b46;border-radius:16px;background:repeating-linear-gradient(0deg,#9bc86b 0 58px,#8dbc5e 58px 116px);min-height:360px;display:grid;grid-template-rows:repeat(5,1fr)}
+.lane{position:relative;border-bottom:1px dashed #ffffff88;min-height:68px}.lane:last-child{border:0}
+.lane:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#ffffff12,transparent 40%,#ffffff10);pointer-events:none}
+.cellgrid{position:absolute;inset:0 0 0 8%;display:grid;grid-template-columns:repeat(8,1fr)}
+.cell{border-left:1px solid #ffffff27;cursor:pointer}.cell:hover{background:#ffffff25}
+.actor{position:absolute;z-index:3;transform:translate(-50%,-50%);font-size:clamp(1.7rem,4vw,2.4rem);filter:drop-shadow(1px 2px 1px #345);user-select:none}
+.actor.plant{left:var(--x)}.actor.zombie{left:var(--x);transition:left .15s linear}.projectile{position:absolute;z-index:4;width:12px;height:12px;border-radius:50%;background:#b7f34c;border:2px solid #427b25;box-shadow:0 0 8px #eaff90}
+.hud{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:9px}
+.shop{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.seed{background:#f5f1d8;color:#24472a;border:2px solid #b8cc93;box-shadow:none;padding:8px 5px;font-size:.86rem}.seed.selected{outline:3px solid #e0ad27;background:#fff2b8}.seed b{display:block;font-size:1.25rem}
+.side{display:flex;flex-direction:column;gap:12px}.question h2{font-size:1.15rem;margin:.2rem 0 .8rem}.qmeta{color:#5e775b;font-size:.82rem;font-weight:800}.choices{display:grid;gap:8px}.choice{display:flex;gap:9px;align-items:flex-start;border:1.5px solid #d4dfc7;background:#fff;border-radius:11px;padding:10px}.choice input{margin-top:4px;accent-color:#32733b}.textanswers{display:grid;gap:9px}.answerrow{display:grid;grid-template-columns:1fr;gap:5px}.answerrow label{font-size:.88rem;font-weight:700}.answer-entry{display:flex;gap:7px;align-items:stretch}.factor-pair{display:flex;gap:10px;flex-wrap:wrap}.factor-part{display:flex;align-items:center;gap:3px;font-size:1.2rem;font-weight:800}.factor-part .answer-entry{min-width:110px;flex:1}.factor-part .answer-input{min-width:65px}.answer-entry .answer-input{flex:1;min-width:0}.power-btn{min-width:46px;padding:.45rem .7rem;border:2px solid #cbdcb9;border-radius:10px;background:#f0f7e9;color:#214d2c;font-size:1.15rem;font-weight:900;box-shadow:none}.power-btn:active{background:#dceecb}
+.feedback{border-radius:12px;padding:10px;font-weight:700;margin-top:10px}.good{background:#e1f5d9;color:#205c2d}.bad{background:#ffe5df;color:#842d24}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.secondary{background:#e9f0df;color:#23482b;box-shadow:none;border:1px solid #b8cda8}.danger{background:#a23a31}.progress{height:10px;background:#e3ebd9;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:#5caa46;width:0;transition:width .3s}
+.result{text-align:center}.score{font-size:clamp(2.4rem,8vw,4rem);font-weight:900;color:#246a36}.foot{font-size:.78rem;color:#64755f;margin:12px 0}
+@media(max-width:760px){.gamegrid{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.board{min-height:330px}.side{display:grid}.shop{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.wrap{padding:9px}.panel{padding:12px}.stat{font-size:.85rem}.board{min-height:300px}.seed{font-size:.76rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <div class="sub">MISIÓN MATEMÁTICA · TERCER GRADO</div>
+  <h1>🌻 Defiende el jardín</h1>
+  <div class="sub">Resuelve el examen de factorización, consigue soles y protege las cinco líneas del jardín.</div>
+</header>
+
+<section id="start" class="panel">
+  <h2>📝 Registro del estudiante</h2>
+  <p>La partida es individual y permite un solo intento por registro. Al terminar, otro estudiante podrá jugar en este mismo dispositivo con sus propios datos.</p>
+  <div class="formgrid">
+    <div class="field"><label for="student">Nombre completo</label><input id="student" maxlength="100" autocomplete="name" placeholder="Nombre y apellidos"></div>
+    <div class="field"><label for="group">Grado y grupo</label><select id="group"><option value="">Selecciona</option><option>3° A</option><option>3° B</option><option>3° C</option><option>Otro</option></select></div>
+  </div>
+  <p class="small">Necesitas conexión la primera vez para cargar el juego. Después de cargarlo, puede funcionar sin internet en este mismo navegador y dispositivo.</p>
+  <button id="begin">Entrar al jardín</button>
+  <p id="startError" class="feedback bad hidden"></p>
+</section>
+
+<section id="play" class="hidden">
+  <div class="topstats">
+    <div class="stat">☀️ Soles: <span id="sunCount">50</span></div>
+    <div class="stat">⭐ Aciertos: <span id="hits">0</span>/37</div>
+    <div class="stat">🧟 Oleada: <span id="wave">1</span>/13</div>
+    <div class="stat">🌿 Jardín: <span id="health">100</span>%</div>
+  </div>
+  <div class="progress"><i id="progress"></i></div>
+  <div class="gamegrid">
+    <div class="boardwrap panel">
+      <div class="hud"><b>🏡 Tu jardín · 5 carriles</b><span class="small" id="hint">Elige una planta y toca una casilla</span></div>
+      <div id="board" class="board" aria-label="Jardín de cinco carriles">
+        <div class="cellgrid" id="cellgrid"></div>
+      </div>
+      <div class="foot">Selecciona una planta, después toca una casilla libre. Los lanzaguisantes atacan automáticamente y las nueces retrasan a los zombis.</div>
+      <div class="shop">
+        <button class="seed" data-plant="sun"><b>🌻</b>Girasol<br>50 soles</button>
+        <button class="seed" data-plant="pea"><b>🌱</b>Lanzaguisantes<br>100 soles</button>
+        <button class="seed" data-plant="nut"><b>🌰</b>Nuez<br>75 soles</button>
+      </div>
+    </div>
+    <div class="side">
+      <div class="panel question">
+        <div class="qmeta" id="qmeta">PREGUNTA 1 DE 13</div>
+        <h2 id="qtitle"></h2>
+        <div id="qbody"></div>
+        <div id="feedback" aria-live="polite"></div>
+        <div class="actions"><button id="submit">Confirmar respuesta</button></div>
+      </div>
+      <div class="panel">
+        <b>🌻 Defensa del jardín</b>
+        <p class="small">No puedes volver a una pregunta anterior ni cambiar una respuesta después de confirmarla.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="finish" class="panel result hidden">
+  <div style="font-size:3rem">🏆🌻🌻🌻</div>
+  <h2>¡El jardín está a salvo!</h2>
+  <p>Terminaste las 13 preguntas del examen.</p>
+  <div class="score"><span id="finalHits">0</span>/37</div>
+  <h2>Calificación: <span id="finalGrade">0.0</span> / 10</h2>
+  <p id="syncState" class="feedback">Guardando resultado en el registro…</p>
+  <p class="small">El resultado queda registrado en este dispositivo. El envío a la hoja de cálculo requiere tener configurada la conexión de Google Sheets.</p>
+  <button id="nextStudent" class="secondary">Registrar a otro estudiante</button>
+</section>
+<div class="foot">Videojuego educativo de factorización · Los datos se guardan en este dispositivo y se sincronizan cuando haya conexión.</div>
+</div>
+
+<script>
+/* CONFIGURACIÓN: pega aquí la URL de tu implementación web de Google Apps Script. */
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx58L7aG0ZlgyLaWC6PTcgXdOHP2hnGQB1O_Dj7gTh8raWc6kBriRH_EfDYMOa6QnFBKw/exec";
+
+const QUESTIONS = [
+ {title:"Explica con tus propias palabras qué es la factorización.",type:"text",points:1,fields:[{id:"a",label:"Tu explicación"}],check:a=>flexibleDefinition("factorizacion",a.a)},
+ {title:"¿Qué es un factor?",type:"choice",points:1,options:["Es el resultado que se obtiene al dividir una cantidad entre otra.","Es cada uno de los números o expresiones que se multiplican para obtener un producto.","Es el resultado que se obtiene al sumar dos o más números.","Es el número que indica cuántas veces se debe sumar una cantidad."],correct:1},
+ {title:"¿Cuál es la propiedad que cumple la factorización?",type:"choice",points:1,options:["Conmutativa","Asociativa","Distributiva"],correct:2},
+ {title:"¿Qué es el factor común?",type:"choice",points:1,options:["Es un número o expresión que se encuentra multiplicando en todos los términos de una expresión algebraica.","Es el resultado de sumar todos los términos de una expresión algebraica.","Es un número que se obtiene al multiplicar los coeficientes de todos los términos.","Es un procedimiento que consiste en elevar al cuadrado cada término de una expresión algebraica."],correct:0},
+ {title:"Explica: ¿qué es la diferencia de cuadrados?",type:"text",points:1,fields:[{id:"a",label:"Tu explicación"}],check:a=>flexibleDefinition("diferencia",a.a)},
+ {title:"Complementa el esquema de la expresión 2x² + 5x − 4y.",type:"multi",points:5,fields:[
+  {id:"coef",label:"Coeficiente",valid:["2","5","4"],listValid:["2","5","4"]},
+  {id:"exp",label:"Exponente",valid:["2","1"],listValid:["2","1"]},
+  {id:"variable",label:"Variable",valid:["x","y"],listValid:["x","y"]},
+  {id:"sign",label:"Signo",valid:["+","-"],listValid:["+","-"]},
+  {id:"term",label:"Términos",valid:["2x^2","2xcuadrada","2xalcuadrado","5x","-4y","4y"],listValid:["2x^2","2xcuadrada","2xalcuadrado","5x","-4y","4y"]}
+ ]},
+ {title:"Construye la expresión algebraica de cada oración.",type:"multi",points:5,fields:[
+  {id:"p1",label:"Dos números cuyo producto sea 45"},
+  {id:"p2",label:"Un número multiplicado por sí mismo cuyo producto es 16"},
+  {id:"p3",label:"Cuatro libretas, dos lapiceros y dos cuadernos"},
+  {id:"p4",label:"La diferencia de dos números"},
+  {id:"p5",label:"La diferencia del área de dos cuadrados"}
+ ],check:a=>[
+  ((has(a.p1,["45"]) && (hasAll(a.p1,["x","y"]) || hasAll(a.p1,["a","b"]) || hasAll(a.p1,["m","n"]) || hasAll(a.p1,["5","9"]) || hasAll(a.p1,["3","15"]) || hasAll(a.p1,["1","45"]))) || hasAnyWord(a.p1,["5*9","9*5","3*15","15*3","1*45","45*1"])),
+  (hasAnyWord(a.p2,["4^2","4²","4*4","4x4","4por4","cuatrovecescuatro"])) || ((has(a.p2,["16"]) || hasAnyWord(a.p2,["4^2","4²"])) && hasAnyWord(a.p2,["x2","x^2","a2","a^2","n2","n^2","x*x","a*a","n*n"])),
+  hasAll(a.p3,["4","2"]) && hasAnyWord(a.p3,["l","libreta"]) && hasAnyWord(a.p3,["p","lapicero"]) && hasAnyWord(a.p3,["c","cuaderno"]),
+  hasAnyWord(a.p4,["-","resta","diferencia","menos"]) && (hasAll(a.p4,["x","y"]) || hasAll(a.p4,["a","b"]) || hasAll(a.p4,["m","n"])),
+  isDifferenceOfSquaresAnswer(a.p5)
+ ]},
+ {title:"Relaciona el nombre de la factorización con su proceso.",type:"multi",points:4,fields:[
+  {id:"r1",label:"(3)(x + 3) = 3x + 9",opts:["Factor común","Diferencia de cuadrados"],correct:"Factor común"},
+  {id:"r2",label:"(x + y)(x − y) = x² − y²",opts:["Factor común","Diferencia de cuadrados"],correct:"Diferencia de cuadrados"},
+  {id:"r3",label:"(2 − 4)(2 + 4) = 2² − 4²",opts:["Factor común","Diferencia de cuadrados"],correct:"Diferencia de cuadrados"},
+  {id:"r4",label:"(x)(3 + 4) = 3x + 4x",opts:["Factor común","Diferencia de cuadrados"],correct:"Factor común"}
+ ]},
+ {title:"Factoriza las siguientes expresiones por factor común.",type:"multi",points:5,fields:[
+  {id:"f1",common:true,label:"3x + 4x",placeholder:"Escribe la factorización"},
+  {id:"f2",common:true,label:"4 + 8x",placeholder:"Escribe una factorización equivalente"},
+  {id:"f3",common:true,label:"5y + 8y",placeholder:"Escribe la factorización"},
+  {id:"f4",common:true,label:"10x + 15y",placeholder:"Escribe la factorización"},
+  {id:"f5",common:true,label:"8a + 9a",placeholder:"Escribe la factorización"}
+ ],check:a=>[
+  equivalent(a.f1,["x(3+4)","x(4+3)","(x)(3+4)","(x)(4+3)"]),
+  equivalent(a.f2,["4(1+2x)","2(2+4x)"]),
+  equivalent(a.f3,["y(5+8)","y(8+5)","(y)(5+8)"]),
+  equivalent(a.f4,["5(2x+3y)","(5)(2x+3y)"]),
+  equivalent(a.f5,["a(8+9)","(a)(8+9)","a(9+8)"])
+ ]},
+ {title:"Factoriza las siguientes expresiones por diferencia de cuadrados.",type:"multi",points:5,fields:[
+  {id:"d1",label:"4x² − 16a²",pair:true},
+  {id:"d2",label:"x² − y²",pair:true},
+  {id:"d3",label:"9x² − 4y²",pair:true},
+  {id:"d4",label:"9 − 36",pair:true},
+  {id:"d5",label:"49a² − 16b²",pair:true}
+ ],check:a=>[
+  equivalent(a.d1,["(2x+4a)(2x-4a)","(2x-4a)(2x+4a)"]),
+  equivalent(a.d2,["(x+y)(x-y)","(x-y)(x+y)"]),
+  equivalent(a.d3,["(3x+2y)(3x-2y)","(3x-2y)(3x+2y)"]),
+  equivalent(a.d4,["(3+6)(3-6)","(3-6)(3+6)"]),
+  equivalent(a.d5,["(7a+4b)(7a-4b)","(7a-4b)(7a+4b)"])
+ ]},
+ {title:"Relaciona cada expresión con su factorización.",type:"multi",points:4,fields:[
+  {id:"m1",label:"1. 16x² − 4x²",opts:["(2x)(4 + 2)","(y + a)(y − a)","(2x)(2x + 5)","(4x + 2x)(4x − 2x)"],correct:"(4x + 2x)(4x − 2x)"},
+  {id:"m2",label:"2. 4x² + 10x",opts:["(2x)(4 + 2)","(y + a)(y − a)","(2x)(2x + 5)","(4x + 2x)(4x − 2x)"],correct:"(2x)(2x + 5)"},
+  {id:"m3",label:"3. 8x + 4x",opts:["(2x)(4 + 2)","(y + a)(y − a)","(2x)(2x + 5)","(4x + 2x)(4x − 2x)"],correct:"(2x)(4 + 2)"},
+  {id:"m4",label:"4. y² − a²",opts:["(2x)(4 + 2)","(y + a)(y − a)","(2x)(2x + 5)","(4x + 2x)(4x − 2x)"],correct:"(y + a)(y − a)"}
+ ]},
+ {title:"Problema de la cafetería escolar",type:"multi",points:2,context:"Cada paquete contiene 3 sándwiches y 2 jugos. Se preparan x paquetes.",fields:[
+  {id:"c1",label:"¿Cuál es el factor común?",opts:["3","2","x","y"],correct:"x"},
+  {id:"c2",label:"¿Cuál es la factorización de la expresión?",opts:["(3)(2x)","(x)(2 + 3)","(x)(3 + 2)","(2)(x − 3)"],correct:"(x)(3 + 2)"}
+ ]},
+ {title:"Problema del parque",type:"multi",points:2,context:"El terreno se divide en dos cuadrados de distinta medida, con lados x y y.",fields:[
+  {id:"p13a",label:"¿Cuál es la expresión que representa la diferencia de sus áreas?",opts:["(x + y)(x + y)","x² + y²","x² − x²","x² − y²"],correct:"x² − y²"},
+  {id:"p13b",label:"¿Cuál es la factorización correspondiente?",opts:["(x² + y²)(x² + y²)","(x² + y²)(x² − y²)","(x + y)(x − y)","(x)(x − y)"],correct:"(x + y)(x − y)"}
+ ]}
+];
+
+const $=id=>document.getElementById(id);
+const norm=s=>(s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"").replace(/[·×]/g,"*").replace(/−/g,"-").replace(/²/g,"^2").replace(/³/g,"^3").replace(/[{}]/g,"");
+function has(s,parts){const n=norm(s);return parts.some(p=>n.includes(norm(p)))}
+function hasAll(s,parts){const n=norm(s);return parts.every(p=>n.includes(norm(p)))}
+function equivalent(s,answers){const n=norm(s).replace(/\*/g,"");return answers.some(x=>n===norm(x).replace(/\*/g,""))}
+function cleanAnswer(s){return norm(s).replace(/[.,;:!?¿¡()\[\]{}]/g,"").replace(/\s+/g,"")}
+function hasAnyWord(s,words){const n=norm(s);return words.some(w=>n.includes(norm(w)))}
+function splitEntries(value){
+ // Acepta elementos escritos individualmente o en una lista: "2", "2, 5, 4", "2 5 4".
+ return (value||"").toString().split(/[;,\n]+/).flatMap(part=>part.trim().split(/\s+/)).map(x=>x.trim()).filter(Boolean);
+}
+function validField(f,value){
+ // En los menús de relación se compara la opción completa: dividir "Factor común"
+ // en palabras hacía que una respuesta correcta se calificara como incorrecta.
+ if(f.opts){
+   return f.correct!==undefined && cleanAnswer(value)===cleanAnswer(f.correct);
+ }
+ const entries=splitEntries(value);
+ if(!entries.length)return false;
+ const accepted=(f.listValid||f.valid||[]).map(cleanAnswer);
+ if(accepted.length){
+   // La consigna es de reconocimiento por elemento: UNO solo de los elementos válidos basta.
+   // Si escribe varios, basta con que al menos uno corresponda a la expresión.
+   return entries.some(entry=>accepted.includes(cleanAnswer(entry)));
+ }
+ return f.correct!==undefined && entries.some(entry=>cleanAnswer(entry)===cleanAnswer(f.correct));
+}
+function isDifferenceOfSquaresAnswer(value){
+ const raw=(value||"").toString().toLowerCase().normalize("NFD")
+  .replace(/[\\u0300-\\u036f]/g,"").replace(/²/g,"^2")
+  .replace(/al cuadrado/g,"^2").replace(/cuadrado/g,"^2")
+  .replace(/menos|resta|diferencia/g,"-").replace(/[\\s()]/g,"");
+ // Acepta bases numéricas o literales, siempre que ambos términos estén elevados al cuadrado.
+ return /^(?:\\d+|[a-z][a-z0-9]*)\\^2-(?:\\d+|[a-z][a-z0-9]*)\\^2$/.test(raw);
+}
+function editDistance(a,b){const row=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let prev=row[0];row[0]=i;for(let j=1;j<=b.length;j++){const old=row[j];row[j]=Math.min(row[j]+1,row[j-1]+1,prev+(a[i-1]===b[j-1]?0:1));prev=old}}return row[b.length]}
+function hasFlexibleConcept(text,terms){const raw=(text||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/²/g,"^2");const words=raw.match(/[a-z0-9]+/g)||[];return terms.some(term=>{const t=norm(term);return words.some(w=>w===t||(t.length>=5&&w.length>=5&&editDistance(w,t)<=1))||norm(text).includes(t)})}
+function flexibleDefinition(kind,s){
+ const n=norm(s); if(!n)return false;
+ if(kind==="factorizacion"){
+  const action=hasFlexibleConcept(n,["transforma","transformar","convierte","convertir","descompone","descomponer","expresa","expresar","separa","separar","factorizar","factorizacion","escribe"]);
+  const product=hasFlexibleConcept(n,["producto","multiplicacion","multiplicar","factores","factor"]);
+  const multiplicationOfFactors=hasFlexibleConcept(n,["multiplicacion","multiplicar","producto"])&&hasFlexibleConcept(n,["factores","factor"]);
+  const expression=hasFlexibleConcept(n,["expresion","algebraica","terminos","numero"]);
+  const productOfFactors=hasFlexibleConcept(n,["producto"])&&hasFlexibleConcept(n,["factores","factor"]);
+  return (action&&product)||(product&&expression)||(action&&expression)||productOfFactors||multiplicationOfFactors;
+ }
+ if(kind==="diferencia"){
+  const raw=(s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/²/g,"^2").replace(/\s+/g,"");
+  const squares=hasFlexibleConcept(n,["cuadrado","cuadrados","perfectos"]) || /[a-z][a-z0-9]*\^2?[-−][a-z][a-z0-9]*\^2?/.test(raw);
+  const subtraction=hasFlexibleConcept(n,["resta","restar","diferencia","menos","restados"]) || /[-−]/.test(raw);
+  const factorForm=/\([^()]+[-+]\s*[^()]+\)\([^()]+[+]\s*[^()]+\)/.test(raw) || /\([^()]+[+]\s*[^()]+\)\([^()]+[-]\s*[^()]+\)/.test(raw);
+  const method=hasFlexibleConcept(n,["metodo","factorizacion","factorizar"]);
+  const twoTerms=hasFlexibleConcept(n,["terminos","binomio","dos","pareja"]);
+  const factors=hasFlexibleConcept(n,["binomios","factores","factoriza","signos","contrarios","opuestos"]);
+  return (squares&&subtraction) || factorForm || method || (squares&&twoTerms) || (subtraction&&factors) || (twoTerms&&factors);
+ }
+ return false;
+}
+let state={name:"",group:"",index:0,hits:0,suns:50,plants:[],answers:[],health:100,started:false,finished:false};
+let selectedPlant=null,zombies=[],shots=[],lastTick=0,raf=null;
+const STORE="garden_factorization_v1",LOCK="garden_factorization_completed_v1",COMPLETED="garden_factorization_completed_students_v1";
+function save(){localStorage.setItem(STORE,JSON.stringify(state))}
+function normalizeRegistration(value){return (value||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim()}
+function registrationKey(name,group){return normalizeRegistration(name)+"|"+normalizeRegistration(group)}
+function getCompleted(){try{const v=JSON.parse(localStorage.getItem(COMPLETED)||"[]");return Array.isArray(v)?v:[]}catch(e){return []}}
+function isRegistrationCompleted(name,group){return getCompleted().includes(registrationKey(name,group))}
+function markRegistrationCompleted(){const key=registrationKey(state.name,state.group),items=getCompleted();if(!items.includes(key)){items.push(key);localStorage.setItem(COMPLETED,JSON.stringify(items))}localStorage.setItem(LOCK,"1")}
+function migrateLegacyCompletion(){try{const old=JSON.parse(localStorage.getItem(STORE)||"null");if(localStorage.getItem(LOCK)&&old&&old.finished&&old.name&&old.group){const key=registrationKey(old.name,old.group),items=getCompleted();if(!items.includes(key)){items.push(key);localStorage.setItem(COMPLETED,JSON.stringify(items))}}}catch(e){}}
+function restore(){try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&s.started&&!s.finished){state=s;return true}}catch(e){}return false}
+function makeBoard(){
+ const b=$("board"),cg=$("cellgrid");cg.innerHTML="";
+ for(let i=0;i<40;i++){let c=document.createElement("div");c.className="cell";c.dataset.cell=i;cg.append(c)}
+ cg.addEventListener("click",e=>{const c=e.target.closest(".cell");if(!c||!selectedPlant)return;placePlant(+c.dataset.cell)});
+}
+function plantEmoji(t){return t==="sun"?"🌻":t==="pea"?"🌱":"🌰"}
+function placePlant(cell){
+ const cost={sun:50,pea:100,nut:75}[selectedPlant];if(state.suns<cost||state.plants.some(p=>p.cell===cell)){ $("hint").textContent="No hay suficientes soles o la casilla está ocupada.";return}
+ state.suns-=cost;state.plants.push({cell,type:selectedPlant,hp:selectedPlant==="nut"?5:3,shot:0,produce:0});selectedPlant=null;document.querySelectorAll(".seed").forEach(b=>b.classList.remove("selected"));renderBoard();save();updateStats()
+}
+document.querySelectorAll(".seed").forEach(b=>b.addEventListener("click",()=>{selectedPlant=b.dataset.plant;document.querySelectorAll(".seed").forEach(x=>x.classList.toggle("selected",x===b));$("hint").textContent="Toca una casilla libre para colocar "+b.textContent.trim()}));
+function renderBoard(){
+ document.querySelectorAll(".actor,.projectile").forEach(x=>x.remove());
+ state.plants.forEach(p=>{let lane=Math.floor(p.cell/8),col=p.cell%8,el=document.createElement("div");el.className="actor plant";el.textContent=plantEmoji(p.type);el.style.left=(8+(col+.5)*11.5)+"%";el.style.top=((lane+.5)*20)+"%";$("board").append(el)});
+ zombies.forEach(z=>{let el=document.createElement("div");el.className="actor zombie";el.textContent=z.chomping?"🧟‍♂️":"🧟";el.style.left=z.x+"%";el.style.top=((z.lane+.5)*20)+"%";$("board").append(el)});
+ shots.forEach(s=>{let el=document.createElement("div");el.className="projectile";el.style.left=s.x+"%";el.style.top=((s.lane+.5)*20)+"%";$("board").append(el)});
+}
+function queueZombies(count=3){for(let i=0;i<count;i++){zombies.push({x:98+(i*2.5),lane:Math.floor(Math.random()*5),hp:3,speed:.030,chomping:false,target:null})}}
+function updateStats(){$("sunCount").textContent=state.suns;$("hits").textContent=state.hits;$("wave").textContent=Math.min(state.index+1,13);$("health").textContent=state.health;$("progress").style.width=(state.index/13*100)+"%"}
+function tick(ts){
+ if(!lastTick)lastTick=ts;let dt=Math.min((ts-lastTick)/16.67,2);lastTick=ts;
+ state.plants.forEach(p=>{
+  if(p.type==="sun"){p.produce+=dt;if(p.produce>500){p.produce=0;state.suns+=25}}
+  if(p.type==="pea"){p.shot+=dt;if(p.shot>80){p.shot=0;shots.push({x:8+((p.cell%8)+.5)*11.5,lane:Math.floor(p.cell/8)})}}
+ });
+ shots.forEach(s=>{s.x+=.85*dt;let z=zombies.find(z=>z.lane===s.lane&&Math.abs(z.x-s.x)<4);if(z){z.hp--;s.dead=true;if(z.hp<=0)z.dead=true}});
+ shots=shots.filter(s=>!s.dead&&s.x<102);
+ zombies.forEach(z=>{
+  let blocker=state.plants.find(p=>Math.floor(p.cell/8)===z.lane&&Math.abs((8+((p.cell%8)+.5)*11.5)-z.x)<5);
+  if(blocker){z.chomping=true;z.bite=(z.bite||0)+dt;if(z.bite>65){blocker.hp--;z.bite=0;if(blocker.hp<=0)blocker.dead=true}}
+  else{z.chomping=false;z.x-=z.speed*dt}
+  if(z.x<7){z.dead=true;state.health=Math.max(0,state.health-10)}
+ });
+ zombies=zombies.filter(z=>!z.dead);state.plants=state.plants.filter(p=>!p.dead);
+ if(state.index>=13&&zombies.length===0){finishGame();return}
+ renderBoard();updateStats();raf=requestAnimationFrame(tick)
+}
+function startEngine(){if(raf)cancelAnimationFrame(raf);lastTick=0;raf=requestAnimationFrame(tick)}
+function addPowerButton(input){
+ const wrap=document.createElement("div");wrap.className="answer-entry";
+ input.parentNode.insertBefore(wrap,input);wrap.append(input);
+ const btn=document.createElement("button");btn.type="button";btn.className="power-btn";btn.textContent="²";btn.title="Insertar exponente al cuadrado";btn.setAttribute("aria-label","Insertar exponente al cuadrado");
+ btn.addEventListener("click",()=>{
+  const start=input.selectionStart??input.value.length,end=input.selectionEnd??start;
+  input.value=input.value.slice(0,start)+"²"+input.value.slice(end);
+  const pos=start+1;input.focus();input.setSelectionRange(pos,pos);
+  input.dispatchEvent(new Event("input",{bubbles:true}));
+ });
+ wrap.append(btn);
+}
+function renderQuestion(){
+ const q=QUESTIONS[state.index];queueZombies(1);$("qmeta").textContent=`PREGUNTA ${state.index+1} DE 13 · VALOR ${q.points} ${q.points===1?"ACIERTO":"ACIERTOS"}`;$("qtitle").textContent=q.title;$("qbody").innerHTML="";if(q.context){const context=document.createElement("p");context.className="small";context.textContent=q.context;$("qbody").append(context)}
+ 
+ if(q.type==="choice"){let box=document.createElement("div");box.className="choices";q.options.forEach((o,i)=>{let l=document.createElement("label");l.className="choice";l.innerHTML=`<input type="radio" name="answer" value="${i}"><span>${String.fromCharCode(97+i)}) ${o}</span>`;box.append(l)});let alt=document.createElement("input");alt.id="choiceText";alt.className="answer-input";alt.placeholder="Escribe tu respuesta";alt.maxLength=180;box.append(alt);addPowerButton(alt);$("qbody").append(box)}
+ else if(q.type==="text"||q.type==="multi"){
+  let box=document.createElement("div");box.className="textanswers";
+  q.fields.forEach(f=>{let row=document.createElement("div");row.className="answerrow";let label=document.createElement("label");label.textContent=f.label;label.htmlFor=f.id;row.append(label);
+   if(f.opts && !f.valid){let sel=document.createElement("select");sel.id=f.id;sel.className="answer-input";sel.innerHTML='<option value="">Selecciona una respuesta</option>'+f.opts.map(o=>`<option>${o}</option>`).join("");row.append(sel)}
+   else if(f.common){
+    const pair=document.createElement("div");pair.className="factor-pair";
+    const factor=document.createElement("input");factor.id=f.id+"a";factor.className="answer-input";factor.placeholder="Factor";factor.maxLength=80;
+    const inner=document.createElement("input");inner.id=f.id+"b";inner.className="answer-input";inner.placeholder="Contenido";inner.maxLength=100;
+    pair.append(factor,document.createTextNode("("),inner,document.createTextNode(")"));addPowerButton(factor);addPowerButton(inner);row.append(pair);
+   }
+   else if(f.pair){
+    const pair=document.createElement("div");pair.className="factor-pair";
+    ["a","b"].forEach((part,index)=>{const group=document.createElement("span");group.className="factor-part";const open=document.createElement("span");open.textContent=index===0?"(":"(";const inp=document.createElement("input");inp.id=f.id+part;inp.className="answer-input";inp.placeholder="Factor";inp.maxLength=80;group.append(open,inp,document.createTextNode(")"));pair.append(group);addPowerButton(inp)});
+    row.append(pair);
+   }
+   else{let inp=document.createElement("input");inp.id=f.id;inp.className="answer-input";inp.placeholder="Respuesta";inp.maxLength=180;row.append(inp);addPowerButton(inp)}
+   box.append(row)});
+  $("qbody").append(box)
+ }
+ $("feedback").innerHTML="";$("submit").disabled=false;updateStats()
+}
+function grade(q,a){
+ if(q.type==="choice"){
+  if(Number(a.choice)===q.correct)return 1;
+  const t=cleanAnswer(a.text||"");
+  if(!t)return 0;
+  if(q.title.includes("¿Qué es un factor?"))return hasAnyWord(t,["multiplican","multiplicacion","producto","factores"])?1:0;
+  if(q.title.includes("propiedad"))return hasAnyWord(t,["distributiva","distribuir","distribuye"])?1:0;
+  if(q.title.includes("factor común"))return hasAnyWord(t,["comun","todoslosterminos","multiplicando","factor"])?1:0;
+  return 0;
+ }
+ if(q.type==="text")return q.check(a)?1:0;
+ if(q.title.startsWith("Complementa"))return q.fields.reduce((n,f)=>n+(validField(f,a[f.id])?1:0),0);
+ if(q.title.startsWith("Construye"))return q.check(a).filter(Boolean).length;
+ if(q.title.startsWith("Relaciona el nombre"))return q.fields.reduce((n,f)=>n+(validField(f,a[f.id])?1:0),0);
+ if(q.title.startsWith("Factoriza"))return q.check(a).filter(Boolean).length;
+ return q.fields.reduce((n,f)=>n+(norm(a[f.id])===norm(f.correct)?1:0),0);
+}
+function getAnswer(q){
+ if(q.type==="choice"){let x=document.querySelector('input[name="answer"]:checked');return {choice:x?x.value:"",text:$("choiceText")?.value.trim()||""}}
+ let a={};q.fields.forEach(f=>{a[f.id]=f.pair?`(${$(f.id+"a")?.value.trim()||""})(${$(f.id+"b")?.value.trim()||""})`:f.common?`${$(f.id+"a")?.value.trim()||""}(${$(f.id+"b")?.value.trim()||""})`:($(f.id)?.value.trim()||"")});return a
+}
+function answer(){
+ const q=QUESTIONS[state.index],a=getAnswer(q);let empty=Object.values(a).every(v=>!v);if(empty){$("feedback").innerHTML='<div class="feedback bad">Selecciona o escribe tu respuesta antes de continuar.</div>';return}
+ const pts=grade(q,a);state.hits+=pts;state.suns+=pts*25;state.answers.push({question:state.index+1,answer:a,score:pts,max:q.points});
+ if(pts>0){$("feedback").innerHTML=`<div class="feedback good">Respuesta registrada: ${pts} de ${q.points} acierto(s). Ganaste ${pts*25} soles. 🌻</div>`}
+ else{$("feedback").innerHTML=`<div class="feedback bad">Respuesta registrada. No se obtuvo acierto en este apartado. 🧟</div>`}
+ $("submit").disabled=true;updateStats();save();
+ setTimeout(()=>{state.index++;if(state.index<QUESTIONS.length){renderQuestion();save()}else{$("qmeta").textContent="ÚLTIMA OLEADA";$("qtitle").textContent="¡Defiende el jardín!";$("qbody").innerHTML='<p>Las plantas siguen atacando a los zombis. Espera a que termine la oleada final…</p>';$("submit").classList.add("hidden");let safety=0;let finishTimer=setInterval(()=>{safety++;if(zombies.length===0||safety>20){clearInterval(finishTimer);zombies=[];renderBoard();finishGame()}},500)}},1300)
+}
+function finishGame(){
+ if(state.finished)return;state.finished=true;markRegistrationCompleted();save();if(raf)cancelAnimationFrame(raf);
+ $("play").classList.add("hidden");$("finish").classList.remove("hidden");$("finalHits").textContent=state.hits;$("finalGrade").textContent=(state.hits*10/37).toFixed(2);
+ enqueueResult();syncOutbox()
+}
+function begin(){
+ const name=$("student").value.trim(),group=$("group").value;if(name.length<4||!group){$("startError").textContent="Escribe tu nombre completo y selecciona tu grado y grupo."; $("startError").classList.remove("hidden");return}
+ if(isRegistrationCompleted(name,group)){$("startError").textContent="Este registro ya realizó el examen en este dispositivo. Cada estudiante puede realizar un solo intento; otro estudiante puede ingresar con su propio nombre y grupo.";$("startError").classList.remove("hidden");return}
+ $("startError").classList.add("hidden");
+ state.name=name;state.group=group;state.started=true;state.index=0;state.hits=0;state.suns=50;state.answers=[];state.plants=[];state.health=100;save();enterPlay()
+}
+function enterPlay(){$("start").classList.add("hidden");$("play").classList.remove("hidden");$("finish").classList.add("hidden");$("submit").classList.remove("hidden");makeBoard();renderBoard();renderQuestion();startEngine()}
+function nextStudent(){$("finish").classList.add("hidden");$("start").classList.remove("hidden");$("student").value="";$("group").value="";$("startError").classList.add("hidden");$("student").focus()}
+$("begin").addEventListener("click",begin);$("submit").addEventListener("click",answer);$("nextStudent").addEventListener("click",nextStudent);
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+migrateLegacyCompletion();
+if(restore()){enterPlay()}
+const OUTBOX="garden_factorization_outbox";
+function enqueueResult(){
+ let item={id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),nombre:state.name,grado_grupo:state.group,fecha:new Date().toISOString(),aciertos:state.hits,total:37,calificacion:Number((state.hits*10/37).toFixed(2)),respuestas:JSON.stringify(state.answers)};
+ let box=JSON.parse(localStorage.getItem(OUTBOX)||"[]");if(!box.some(x=>x.id===item.id))box.push(item);localStorage.setItem(OUTBOX,JSON.stringify(box))
+}
+async function syncOutbox(){
+ let box=JSON.parse(localStorage.getItem(OUTBOX)||"[]");if(!box.length){$("syncState").textContent="Resultado guardado.";return}
+ if(!navigator.onLine||APPS_SCRIPT_URL.startsWith("PEGA_AQUI")){$("syncState").textContent="Resultado guardado en este dispositivo. Se enviará a Google Sheets al configurar la conexión y recuperar internet.";return}
+ try{
+  for(const item of box){await fetch(APPS_SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:new URLSearchParams({payload:JSON.stringify(item)})})}
+  localStorage.setItem(OUTBOX,"[]");$("syncState").textContent="Envío realizado a Google Sheets. Si no aparece de inmediato, revisa la implementación del formulario de recepción."
+ }catch(e){$("syncState").textContent="Sin conexión: el resultado sigue guardado y se intentará enviar cuando vuelva internet."}
+}
+window.addEventListener("online",syncOutbox);
+</script>
+</body>
+</html>
